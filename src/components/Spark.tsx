@@ -19,7 +19,7 @@ export function Spark() {
     if (!o) return;
     const { f, r } = headFrame();
     const t = state.clock.elapsedTime;
-    const target = input.head.clone().addScaledVector(f, 1.18).addScaledVector(r, -0.72).setY(input.head.y + 0.48 + Math.sin(t * 1.6) * 0.03);
+    const target = input.head.clone().addScaledVector(f, 1.65).addScaledVector(r, -0.78).setY(input.head.y + 0.45 + Math.sin(t * 1.6) * 0.03);
     if (first.current) {
       o.position.copy(target);
       first.current = false;
@@ -63,7 +63,7 @@ export function NarrationPanel() {
   }, []);
   if (!nar.text) return null;
   return (
-    <group position={[-0.5, -0.04, 0]} scale={0.82}>
+    <group position={[-0.44, -0.18, 0]} scale={0.76}>
       <RoundedBox args={[0.92, 0.26, 0.01]} radius={0.035} smoothness={3}>
         <meshBasicMaterial color="#070b16" transparent opacity={0.8} />
       </RoundedBox>

@@ -46,7 +46,7 @@ function NeuralField() {
       for (let row = 0; row < rows; row++) {
         const line: THREE.Vector3[] = [];
         for (let column = 0; column < columns; column++) {
-          const x = side * (3.8 + column * 0.72 + (row % 2) * 0.22);
+          const x = side * (2.75 + column * 0.72 + (row % 2) * 0.22);
           const y = -0.15 + row * 0.62;
           const z = -2.4 - column * 1.15 + Math.sin(row * 1.7 + column) * 0.22;
           line.push(new THREE.Vector3(x, y, z));

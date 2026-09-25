@@ -26,18 +26,24 @@ export function Flashlight({ light, color, wall }: { light: 0 | 1; color: string
   }, []);
   const q = useMemo(() => new THREE.Quaternion(), []);
   const fwd = useMemo(() => new THREE.Vector3(0, 0, -1), []);
+  const wallOrigin = useMemo(() => new THREE.Vector3(), []);
+  const wallDirection = useMemo(() => new THREE.Vector3(), []);
 
   useFrame(() => {
     const l = input.lights[light];
     const o = g.current;
     if (!o) return;
-    o.position.copy(l.origin);
-    q.setFromUnitVectors(fwd, l.dir);
+    const origin = wall
+      ? wallOrigin.copy(input.head).addScaledVector(input.headDir, 0.28).add(new THREE.Vector3(0, -0.25, 0))
+      : l.origin;
+    const direction = wall ? wallDirection.copy(input.headDir).normalize() : l.dir;
+    o.position.copy(origin);
+    q.setFromUnitVectors(fwd, direction);
     o.quaternion.copy(q);
     // Causal mask: the beam is cut off where it hits the wall plane.
     let len = BEAM_LENGTH;
-    if (wall && l.dir.z > 0.01) {
-      const t = (WALL_Z - l.origin.z) / l.dir.z;
+    if (wall && direction.z > 0.01) {
+      const t = (WALL_Z - origin.z) / direction.z;
       if (t > 0) len = Math.min(len, t);
     }
     if (beam.current) beam.current.scale.set(1, 1, len / BEAM_LENGTH);
