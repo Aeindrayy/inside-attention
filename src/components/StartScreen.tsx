@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useProgress } from "@react-three/drei";
 import { startGame } from "@/game/useGameState";
-import { audio, startDrone } from "@/audio/sfx";
+import { audio, startAmbience } from "@/audio/sfx";
 import { xrStore } from "@/xr";
 
 export function StartScreen() {
@@ -17,7 +17,7 @@ export function StartScreen() {
 
   const begin = (enterVR: boolean) => {
     audio();
-    startDrone();
+    startAmbience();
     startGame();
     if (enterVR) void xrStore.enterVR();
   };
@@ -55,7 +55,7 @@ export function StartScreen() {
         </div>
         {vr === false && <p className="mt-3 text-xs text-muted-foreground">VR needs a WebXR headset browser (e.g. Meta Quest) over HTTPS.</p>}
         <p className="mt-8 text-xs text-muted-foreground">
-          Desktop: mouse aims · click = pinch · right-drag / A D to look · W S or scroll to move · Tab switches light
+          Desktop: mouse aims · click = pinch · right-drag / Q E to turn · W A S D or scroll to move · Tab switches light
         </p>
       </div>
     </div>

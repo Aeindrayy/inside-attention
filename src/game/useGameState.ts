@@ -12,10 +12,11 @@ import {
   AUTO_ADVANCE_AFTER,
   WRONG_GUESS_LINE,
   COLORS,
+  STEP_EXTRA_SECONDS,
   type Step,
 } from "@/data/scenario";
 import { mixRepresentation, transformerAttention } from "./attention";
-import { chime, doorOpen, setMuted, setVoice, speak, whoosh, isMuted, isVoiceOn, crack } from "@/audio/sfx";
+import { chime, doorOpen, setMuted, setVoice, speak, whoosh, isMuted, isVoiceOn, crack, pauseAudio, resumeAudio, stopVoice } from "@/audio/sfx";
 
 export interface GameState {
   phase: "start" | "playing";
@@ -23,6 +24,8 @@ export interface GameState {
   /** seconds (performance.now based) when the current step started */
   stepStart: number;
   fading: boolean;
+  paused: boolean;
+  pausedAt: number | null;
   repColor: string;
   repRiver: string | null;
   repMoney: string | null;
@@ -31,7 +34,6 @@ export interface GameState {
   lineOverride: string[] | null;
   muted: boolean;
   voice: boolean;
-  bloom: boolean;
   activeLight: 0 | 1;
   xr: boolean;
   /** Increments on every absorb to trigger fly animations. */
@@ -45,6 +47,8 @@ let state: GameState = {
   stepIndex: 0,
   stepStart: 0,
   fading: false,
+  paused: false,
+  pausedAt: null,
   repColor: colorOf("bank"),
   repRiver: null,
   repMoney: null,
@@ -53,7 +57,6 @@ let state: GameState = {
   lineOverride: null,
   muted: false,
   voice: true,
-  bloom: false,
   activeLight: 0,
   xr: false,
   absorbs: [],
@@ -112,10 +115,10 @@ export function goto(index: number) {
   const apply = () => enterStep(index);
   if (state.phase === "playing" && needsFade(from, to) && index !== state.stepIndex) {
     setState({ fading: true });
-    setTimeout(() => {
+    scheduleGameDelay(400, () => {
       apply();
       setState({ fading: false });
-    }, 400);
+    });
   } else apply();
 }
 
@@ -140,7 +143,7 @@ function enterStep(index: number) {
   runtime.succeeded = false;
   runtime.pipelineLit = 0;
   setState(patch);
-  if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
+  stopVoice();
   spokenFor.key = "";
 }
 
@@ -152,11 +155,36 @@ export function restart() {
   enterStep(0);
 }
 export function startGame() {
-  setState({ phase: "playing" });
+  setState({ phase: "playing", paused: false, pausedAt: null });
   // Operator shortcut: ?step=4.1 jumps straight to a step.
   const id = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("step") : null;
   const i = id ? STEPS.findIndex((s) => s.id === id) : -1;
   enterStep(Math.max(0, i));
+}
+
+export function togglePause() {
+  if (state.phase !== "playing") return;
+  if (!state.paused) {
+    setState({ paused: true, pausedAt: now() });
+    void pauseAudio();
+    return;
+  }
+  const pausedDuration = state.pausedAt === null ? 0 : now() - state.pausedAt;
+  setState({ paused: false, pausedAt: null, stepStart: state.stepStart + pausedDuration });
+  void resumeAudio();
+}
+
+function scheduleGameDelay(delayMs: number, action: () => void) {
+  let remaining = delayMs;
+  let last = performance.now();
+  const timer = window.setInterval(() => {
+    const current = performance.now();
+    if (!state.paused) remaining -= current - last;
+    last = current;
+    if (remaining > 0) return;
+    window.clearInterval(timer);
+    action();
+  }, 50);
 }
 
 /* ---------- Success actions ---------- */
@@ -235,9 +263,9 @@ export function succeed(forced = false) {
       break;
   }
   const delay = t.type === "slab" ? 300 : t.type === "absorb" ? 1600 : t.type === "bothHeads" ? 1800 : 700;
-  setTimeout(() => {
+  scheduleGameDelay(delay, () => {
     if (currentStep() === step) next();
-  }, delay);
+  });
 }
 
 export function choosePortal(word: string) {
@@ -245,15 +273,15 @@ export function choosePortal(word: string) {
   setState({ portalChoice: word });
   doorOpen();
   chime();
-  setTimeout(() => {
+  scheduleGameDelay(900, () => {
     goto(state.stepIndex + 1);
     if (word !== "PARIS") setState({ lineOverride: [WRONG_GUESS_LINE, "And the process repeats for the next token."] });
-  }, 900);
+  });
 }
 
 /** Called every frame by the director. */
 export function tickStep() {
-  if (state.phase !== "playing" || state.fading) return;
+  if (state.phase !== "playing" || state.fading || state.paused) return;
   const step = currentStep();
   const elapsed = now() - state.stepStart;
   const nar = narrationAt(step, elapsed);
@@ -267,7 +295,7 @@ export function tickStep() {
   const lines = linesFor(step);
   const linesTotal = lines.reduce((a, l) => a + lineDuration(l), 0);
   if (t.type === "auto") {
-    if (elapsed >= Math.max(linesTotal + 0.6, t.minSeconds ?? 0) && !runtime.succeeded) {
+    if (elapsed >= Math.max(linesTotal + 0.6, t.minSeconds ?? 0) + STEP_EXTRA_SECONDS && !runtime.succeeded) {
       runtime.succeeded = true;
       next();
     }
@@ -287,6 +315,7 @@ export function useOperatorKeys() {
       if (k === "n") next();
       else if (k === "b") prev();
       else if (k === "r") restart();
+      else if (k === "p" || e.key === "Escape") togglePause();
       else if (k === "m") {
         setMuted(!isMuted());
         setState({ muted: isMuted() });

@@ -13,7 +13,7 @@ export const COLORS = {
   headOrange: "#FF9A3A",
   river: "#3AA0FF",
   money: "#FFC23A",
-  mirrorPink: "#FF5FA2",
+  mirrorGreen: "#55E69B",
 };
 
 /** Starting (embedding) colors of tokens. */
@@ -206,7 +206,7 @@ export const STEPS: Step[] = [
   { id: "3.3", stage: "Stage 3 — Softmax + Causal Mask", title: "Turn around", scene: "wall", sentence: "cat", lights: 1, meter: true,
     lines: ["Now turn around."], hint: "Look behind you at the locked future words.", trigger: { type: "lookWall" } },
   { id: "3.4", stage: "Stage 3 — Softmax + Causal Mask", title: "Causal mask", scene: "wall", sentence: "cat", lights: 1, meter: true,
-    lines: ["Imagine finishing a sentence without peeking at words not written yet.", "Those future words stay locked at zero attention. This is the causal mask."],
+    lines: ["When writing the word 'sat', the next words do not exist yet.", "The small gate locks every future token at zero attention. This is the causal mask."],
     trigger: { type: "auto" } },
   // STAGE 4
   { id: "4.1", stage: "Stage 4 — Values Change the Token", title: "Values", scene: "values", sentence: "riverValues", lights: 1, meter: true,
@@ -241,4 +241,5 @@ export const STEPS: Step[] = [
 
 export const WRONG_GUESS_LINE = "Good guess! The model thinks differently. Look at the biggest door.";
 export const HINT_AFTER = 20; // seconds
-export const AUTO_ADVANCE_AFTER = 35; // seconds
+export const STEP_EXTRA_SECONDS = 10;
+export const AUTO_ADVANCE_AFTER = 45; // safety timeout, extended for exploration

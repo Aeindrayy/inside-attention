@@ -1,12 +1,14 @@
 import { STEPS } from "@/data/scenario";
-import { useGame, setState, next, prev, restart } from "@/game/useGameState";
+import { Pause, Play, RotateCcw, SkipBack, SkipForward } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useGame, next, prev, restart, togglePause } from "@/game/useGameState";
 
-/** Desktop-only operator overlay (stage name + step, demo keys, bloom toggle). */
+/** Desktop operator overlay with lesson controls. */
 export function OperatorHUD() {
   const i = useGame((s) => s.stepIndex);
   const muted = useGame((s) => s.muted);
   const voice = useGame((s) => s.voice);
-  const bloom = useGame((s) => s.bloom);
+  const paused = useGame((s) => s.paused);
   const active = useGame((s) => s.activeLight);
   const step = STEPS[i];
   return (
@@ -17,13 +19,15 @@ export function OperatorHUD() {
           Step {step.id} · {step.title}
         </p>
         <div className="mt-2 flex flex-wrap gap-1.5">
-          <HudBtn onClick={prev}>B ◀</HudBtn>
-          <HudBtn onClick={next}>N ▶</HudBtn>
-          <HudBtn onClick={restart}>R restart</HudBtn>
-          <HudBtn onClick={() => setState({ bloom: !bloom })} on={bloom}>Bloom</HudBtn>
+          <HudBtn onClick={prev} label="Previous step"><SkipBack /> B</HudBtn>
+          <HudBtn onClick={togglePause} label={paused ? "Resume lesson" : "Pause lesson"} on={paused}>
+            {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
+          </HudBtn>
+          <HudBtn onClick={next} label="Next step"><SkipForward /> N</HudBtn>
+          <HudBtn onClick={restart} label="Restart lesson"><RotateCcw /> R</HudBtn>
         </div>
         <p className="mt-2 font-display text-xs text-muted-foreground">
-          M {muted ? "muted" : "sound on"} · T voice {voice ? "on" : "off"}
+          P / Esc {paused ? "resume" : "pause"} · M {muted ? "muted" : "sound on"} · T voice {voice ? "on" : "off"}
           {step.lights === 2 && ` · Tab: mouse controls ${active === 1 ? "BLUE (left)" : "ORANGE (right)"}`}
         </p>
       </div>
@@ -31,13 +35,18 @@ export function OperatorHUD() {
   );
 }
 
-function HudBtn({ children, onClick, on }: { children: React.ReactNode; onClick: () => void; on?: boolean }) {
+function HudBtn({ children, onClick, on, label }: { children: React.ReactNode; onClick: () => void; on?: boolean; label: string }) {
   return (
-    <button
+    <Button
+      type="button"
+      size="sm"
+      variant="secondary"
+      aria-label={label}
+      title={label}
       onClick={onClick}
-      className={`rounded-md border px-2.5 py-1 font-display text-xs font-semibold uppercase tracking-wide transition ${on ? "border-accent-glow bg-accent-glow/25 text-foreground" : "border-border bg-secondary text-muted-foreground hover:text-foreground"}`}
+      className={`border font-display text-xs font-semibold uppercase ${on ? "border-accent-glow bg-accent-glow/25 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
     >
       {children}
-    </button>
+    </Button>
   );
 }
