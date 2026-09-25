@@ -82,7 +82,7 @@ export function transformerAttention(
   const base = embedding(player);
   const focused = [...ZERO];
   words.forEach((word, i) => {
-    const strength = Math.pow(focus[i] ?? 0, 2) * 1.35;
+    const strength = Math.pow(focus[i] ?? 0, 2) * 2.4;
     embedding(word).forEach((x, d) => { focused[d] += x * strength; });
   });
   const qInput = normalize(base.map((x, d) => x * 0.65 + focused[d]));

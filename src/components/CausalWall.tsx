@@ -41,7 +41,7 @@ export function CausalWall({ future, startBadge }: { future: string[]; startBadg
           <circleGeometry args={[0.07, 20]} />
           <meshBasicMaterial color="#6CCBFF" toneMapped={false} />
         </mesh>
-        <T position={[-1.65, -0.2, 0]} fontSize={0.075} color="#8ed8ff">PAST ✓</T>
+        <T position={[-1.65, -0.2, 0]} fontSize={0.075} color="#8ed8ff">PAST AVAILABLE</T>
         <mesh position={[-0.65, 0, 0]}>
           <ringGeometry args={[0.065, 0.1, 24]} />
           <meshBasicMaterial color="#ffffff" toneMapped={false} />
@@ -51,7 +51,7 @@ export function CausalWall({ future, startBadge }: { future: string[]; startBadg
           <boxGeometry args={[0.025, 0.42, 0.025]} />
           <meshBasicMaterial color={PINK} toneMapped={false} />
         </mesh>
-        <T position={[1.25, -0.2, 0]} fontSize={0.075} color="#ffb2cf">FUTURE 🔒</T>
+        <T position={[1.25, -0.2, 0]} fontSize={0.075} color="#ffb2cf">FUTURE LOCKED</T>
       </group>
 
       {future.map((word, i) => {
