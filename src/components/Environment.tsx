@@ -1,5 +1,4 @@
-import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useMemo } from "react";
 import { Environment as DreiEnv, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
 import { Model } from "./Model";
@@ -32,37 +31,9 @@ function GridFloor() {
   );
 }
 
-const ringMat = new THREE.MeshStandardMaterial({ color: "#9aa6ba", emissive: "#3AA0FF", emissiveIntensity: 0.6, metalness: 0.95, roughness: 0.3 });
 const platformMat = undefined;
 
-function DistantRings() {
-  const refs = useRef<(THREE.Group | null)[]>([]);
-  const rings = [
-    { p: [-11, 4, -16], s: 6 },
-    { p: [13, 6, -12], s: 8 },
-    { p: [2, 9, -24], s: 12 },
-    { p: [-14, 3, 10], s: 7 },
-  ] as const;
-  useFrame((_, dt) => {
-    refs.current.forEach((r, i) => {
-      if (r) {
-        r.rotation.y += dt * 0.05 * (i % 2 ? 1 : -1);
-        r.rotation.x += dt * 0.02;
-      }
-    });
-  });
-  return (
-    <>
-      {rings.map((r, i) => (
-        <group key={i} position={r.p as unknown as [number, number, number]} ref={(g) => { refs.current[i] = g; }}>
-          <Model name="magical_ring" material={ringMat} size={r.s} />
-        </group>
-      ))}
-    </>
-  );
-}
-
-/** Dark space chamber: fog, grid floor, particles, rings, platform. */
+/** Dark space chamber: fog, grid floor, particles, platform. */
 export function SpaceEnvironment() {
   return (
     <>
@@ -77,7 +48,6 @@ export function SpaceEnvironment() {
       </DreiEnv>
       <GridFloor />
       <Particles />
-      <DistantRings />
       <Platform />
     </>
   );

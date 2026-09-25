@@ -306,6 +306,7 @@ export function Stage() {
               word={w}
               keyMatch={sentence.keyMatch?.[i] ?? 0}
               light={0}
+              color={colorOf(w)}
               valueColor={scene === "values" ? sentence.values?.[i] : undefined}
             />
           );
