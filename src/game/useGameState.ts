@@ -14,7 +14,7 @@ import {
   COLORS,
   type Step,
 } from "@/data/scenario";
-import { mixRepresentation, softmax, score } from "./attention";
+import { mixRepresentation, transformerAttention } from "./attention";
 import { chime, doorOpen, setMuted, setVoice, speak, whoosh, isMuted, isVoiceOn, crack } from "@/audio/sfx";
 
 export interface GameState {
@@ -162,8 +162,7 @@ export function startGame() {
 /* ---------- Success actions ---------- */
 function weightsForTarget(step: Step, target: string, head: 0 | 1 = 0) {
   const s = SENTENCES[step.sentence!];
-  const km = (head === 1 ? s.keyMatch2 : s.keyMatch) ?? s.context.map(() => 0.1);
-  return softmax(km.map((k, i) => score(k, s.context[i] === target ? 1 : 0)));
+  return transformerAttention(s.context, s.player, s.context.map((word) => word === target ? 1 : 0), head);
 }
 
 /** Absorb values from the current weights into the player representation. */

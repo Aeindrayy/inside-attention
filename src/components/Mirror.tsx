@@ -24,7 +24,7 @@ const frameMat = new THREE.MeshStandardMaterial({ color: "#c9d2e0", metalness: 0
  * Attention mirror = a key. The code-made disc in its empty center glows with
  * the attention weight. Higher keyMatch → mirror turns more toward the player.
  */
-export function Mirror({ position, index, word, keyMatch, light, color = "#6CCBFF", valueColor, size = 0.38 }: Props) {
+export function Mirror({ position, index, word, keyMatch, light, color = "#FF5FA2", valueColor, size = 0.38 }: Props) {
   const g = useRef<THREE.Group>(null);
   const disc = useRef<THREE.MeshStandardMaterial>(null);
   const glow = useRef<THREE.Sprite>(null);

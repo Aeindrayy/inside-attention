@@ -4,7 +4,7 @@
  * Edit this file to change the experience without touching game code.
  */
 
-export type Source = "illustrative" | "gpt2";
+export type Source = "illustrative" | "transformer" | "gpt2";
 
 export const COLORS = {
   background: "#05070F",
@@ -13,6 +13,7 @@ export const COLORS = {
   headOrange: "#FF9A3A",
   river: "#3AA0FF",
   money: "#FFC23A",
+  mirrorPink: "#FF5FA2",
 };
 
 /** Starting (embedding) colors of tokens. */
@@ -70,14 +71,14 @@ const s2Key = [0.1, 0.2, 0.1, 0.05, 0.95];
 export const SENTENCES: Record<string, Sentence> = {
   river: {
     id: "river",
-    source: "illustrative",
+    source: "transformer",
     context: ["I", "sat", "on", "the", "river"],
     player: "bank",
     keyMatch: s2Key,
   },
   cat: {
     id: "cat",
-    source: "illustrative",
+    source: "transformer",
     context: ["The", "tired", "old", "cat", "finally"],
     player: "sat",
     keyMatch: [0.05, 0.35, 0.2, 0.95, 0.25],
@@ -85,7 +86,7 @@ export const SENTENCES: Record<string, Sentence> = {
   },
   riverValues: {
     id: "riverValues",
-    source: "illustrative",
+    source: "transformer",
     context: ["I", "sat", "on", "the", "river"],
     player: "bank",
     keyMatch: s2Key,
@@ -93,7 +94,7 @@ export const SENTENCES: Record<string, Sentence> = {
   },
   money: {
     id: "money",
-    source: "illustrative",
+    source: "transformer",
     context: ["I", "deposited", "money", "at", "the"],
     player: "bank",
     keyMatch: [0.1, 0.4, 0.95, 0.1, 0.05],
@@ -101,7 +102,7 @@ export const SENTENCES: Record<string, Sentence> = {
   },
   animal: {
     id: "animal",
-    source: "illustrative",
+    source: "transformer",
     context: ["The", "animal", "didn't", "cross", "the", "street", "because", "it", "was"],
     player: "tired",
     keyMatch: [0.05, 0.95, 0.1, 0.1, 0.05, 0.3, 0.1, 0.5, 0.2],
@@ -109,7 +110,7 @@ export const SENTENCES: Record<string, Sentence> = {
   },
   france: {
     id: "france",
-    source: "illustrative",
+    source: "transformer",
     context: ["The", "capital", "of", "France"],
     player: "is",
     keyMatch: [0.05, 0.7, 0.1, 0.95],
@@ -203,9 +204,9 @@ export const STEPS: Step[] = [
     lines: ["Your attention is shared. It always adds up to 100%.", "Softmax turns match scores into attention weights."],
     hint: "Sweep your light across the words.", trigger: { type: "weightHold", target: "cat", weight: 0.5 } },
   { id: "3.3", stage: "Stage 3 — Softmax + Causal Mask", title: "Turn around", scene: "wall", sentence: "cat", lights: 1, meter: true,
-    lines: ["Now turn around."], hint: "Look behind you at the wall.", trigger: { type: "lookWall" } },
+    lines: ["Now turn around."], hint: "Look behind you at the locked future words.", trigger: { type: "lookWall" } },
   { id: "3.4", stage: "Stage 3 — Softmax + Causal Mask", title: "Causal mask", scene: "wall", sentence: "cat", lights: 1, meter: true,
-    lines: ["GPT cannot look through this wall.", "It can only attend to tokens that came before. This is the causal mask."],
+    lines: ["Imagine finishing a sentence without peeking at words not written yet.", "Those future words stay locked at zero attention. This is the causal mask."],
     trigger: { type: "auto" } },
   // STAGE 4
   { id: "4.1", stage: "Stage 4 — Values Change the Token", title: "Values", scene: "values", sentence: "riverValues", lights: 1, meter: true,
