@@ -443,15 +443,15 @@ function Diagram() {
 }
 
 const pillarMat = new THREE.MeshBasicMaterial({ color: "#6CCBFF", transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
-const corridorRingMat = new THREE.MeshStandardMaterial({ color: "#c0c8d6", emissive: "#3AA0FF", emissiveIntensity: 0.9, metalness: 0.95, roughness: 0.25 });
+const corridorRingMat = new THREE.MeshStandardMaterial({ color: "#c0c8d6", emissive: "#3AA0FF", emissiveIntensity: 0.15, metalness: 0.95, roughness: 0.25 });
 function Corridor() {
-  const rings = [-2.8, -4.3, -7.2, -9.5];
+  const rings = [-7, -9.5, -12];
   const pillars = Array.from({ length: 7 }, (_, i) => -1.5 - i * 1.5);
   return (
     <group>
       {rings.map((z) => (
-        <group key={z} position={[0, 2.2, z]}>
-          <Model name="magical_ring" material={corridorRingMat} size={5.6} />
+        <group key={z} position={[0, 2.6, z]}>
+          <Model name="magical_ring" material={corridorRingMat} size={7} />
         </group>
       ))}
       {pillars.map((z) =>
