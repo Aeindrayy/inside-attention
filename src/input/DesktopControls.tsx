@@ -7,7 +7,7 @@ import { audio, startAmbience } from "@/audio/sfx";
 
 /**
  * Desktop: mouse aims the flashlight from the camera, left click = pinch,
- * right-drag or A/D (+ arrow keys) looks around, W/S and scroll move.
+ * right-drag or Q/E (+ left/right arrows) looks around; W/S, up/down arrows, and scroll move.
  */
 export function DesktopControls() {
   const { camera, gl } = useThree();
@@ -38,6 +38,7 @@ export function DesktopControls() {
       }
     };
     const onWheel = (e: WheelEvent) => {
+      if (getState().paused) return;
       const f = new THREE.Vector3(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
       s.pos.addScaledVector(f, -Math.sign(e.deltaY) * 0.3);
       clampPos(s.pos);
@@ -72,12 +73,10 @@ export function DesktopControls() {
     const paused = getState().paused;
     if (!paused && (k.has("q") || k.has("arrowleft"))) s.yaw += dt * 1.4;
     if (!paused && (k.has("e") || k.has("arrowright"))) s.yaw -= dt * 1.4;
-    if (k.has("arrowup")) s.pitch = Math.min(1.2, s.pitch + dt);
-    if (k.has("arrowdown")) s.pitch = Math.max(-1.2, s.pitch - dt);
     const f = new THREE.Vector3(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
     const r = new THREE.Vector3(Math.cos(s.yaw), 0, -Math.sin(s.yaw));
-    if (!paused && k.has("w")) s.pos.addScaledVector(f, dt * 1.5);
-    if (!paused && k.has("s")) s.pos.addScaledVector(f, -dt * 1.5);
+    if (!paused && (k.has("w") || k.has("arrowup"))) s.pos.addScaledVector(f, dt * 1.5);
+    if (!paused && (k.has("s") || k.has("arrowdown"))) s.pos.addScaledVector(f, -dt * 1.5);
     if (!paused && k.has("a")) s.pos.addScaledVector(r, -dt * 1.5);
     if (!paused && k.has("d")) s.pos.addScaledVector(r, dt * 1.5);
     clampPos(s.pos);

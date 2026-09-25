@@ -8,7 +8,7 @@ import { input } from "@/input";
 import { headFrame } from "@/game/layout";
 import { currentStep, getState, narrationAt, stepElapsed } from "@/game/useGameState";
 
-/** Spark, the AI guide: bobs and orbits ~1 m to the upper-left of the view. */
+/** Spark stays high in the right periphery so it never covers lesson objects. */
 export function Spark() {
   const g = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
@@ -19,7 +19,7 @@ export function Spark() {
     if (!o) return;
     const { f, r } = headFrame();
     const t = state.clock.elapsedTime;
-    const target = input.head.clone().addScaledVector(f, 1.3).addScaledVector(r, -0.72).setY(input.head.y + 0.32 + Math.sin(t * 1.6) * 0.03);
+    const target = input.head.clone().addScaledVector(f, 1.05).addScaledVector(r, 1.35).setY(input.head.y + 0.68 + Math.sin(t * 1.6) * 0.03);
     if (first.current) {
       o.position.copy(target);
       first.current = false;
@@ -63,7 +63,7 @@ export function NarrationPanel() {
   }, []);
   if (!nar.text) return null;
   return (
-    <group position={[0.62, -0.02, 0]}>
+    <group position={[0.58, -0.04, 0]} scale={0.9}>
       <RoundedBox args={[0.92, 0.26, 0.01]} radius={0.035} smoothness={3}>
         <meshBasicMaterial color="#070b16" transparent opacity={0.8} />
       </RoundedBox>

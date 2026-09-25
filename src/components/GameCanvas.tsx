@@ -41,7 +41,7 @@ export function GameCanvas() {
   }, []);
   return (
     <div className="fixed inset-0 bg-background">
-      <Canvas dpr={[1, 1.75]} camera={{ position: [0, 1.6, 0], fov: 60, near: 0.05, far: 120 }} gl={{ antialias: true }}>
+      <Canvas dpr={[1, 1.75]} camera={{ position: [0, 1.6, 0], fov: 72, near: 0.05, far: 120 }} gl={{ antialias: true }}>
         <XR store={xrStore}>
           <XROrigin ref={originRef} />
           <XRSessionFlag />

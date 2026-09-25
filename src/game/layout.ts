@@ -25,7 +25,7 @@ export function arcPositions(n: number, y = TOKEN_Y, radius = ARC_RADIUS): THREE
 
 /** Future tokens behind the causal wall (mirror of an arc, behind the player). */
 export function futurePositions(n: number): THREE.Vector3[] {
-  return Array.from({ length: n }, (_, i) => new THREE.Vector3(((n - 1) / 2 - i) * 0.72, TOKEN_Y + 0.08, FUTURE_Z));
+  return Array.from({ length: n }, (_, i) => new THREE.Vector3(((n - 1) / 2 - i) * 0.54, TOKEN_Y, FUTURE_Z));
 }
 
 /** Yaw-only forward and right vectors of the player's head. */
