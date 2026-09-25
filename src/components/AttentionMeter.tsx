@@ -28,7 +28,7 @@ export function AttentionMeter({ light, words, masked, color, highlight }: { lig
     o.lookAt(input.head);
     const w = runtime.weights[light] ?? [];
     bars.current.forEach((b, i) => {
-      if (b) b.scale.x = THREE.MathUtils.lerp(b.scale.x, Math.max(0.001, w[i] ?? 0), 0.3);
+      if (b) b.scale.x = THREE.MathUtils.lerp(b.scale.x, Math.max(0.001, w[i] ?? 0), 0.72);
     });
     const p = toPercents(words.map((_, i) => w[i] ?? 0));
     const key = p.join(",");

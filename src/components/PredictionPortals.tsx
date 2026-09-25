@@ -62,10 +62,10 @@ function Portal({ p, i, rising }: { p: ReturnType<typeof portalLayout>[number]; 
         <meshStandardMaterial ref={surf} color="#08101f" emissive="#6CCBFF" emissiveIntensity={0.4} transparent opacity={0.9} toneMapped={false} side={THREE.DoubleSide} />
       </mesh>
       <Glow ref={glow} color="#6CCBFF" position={[0, p.h * 0.45, 0.05]} opacity={0.5} />
-      <T position={[0, p.h + 0.45, 0]} fontSize={Math.max(0.22, p.h * 0.14)}>
+      <T position={[0, p.h + 0.24, 0]} fontSize={Math.max(0.14, p.h * 0.11)}>
         {p.word}
       </T>
-      <T position={[0, p.h + 0.16, 0]} fontSize={Math.max(0.16, p.h * 0.09)} color="#6CCBFF">
+      <T position={[0, p.h + 0.06, 0]} fontSize={Math.max(0.1, p.h * 0.075)} color="#6CCBFF">
         {pct}
       </T>
     </group>
