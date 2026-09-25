@@ -153,7 +153,10 @@ export function restart() {
 }
 export function startGame() {
   setState({ phase: "playing" });
-  enterStep(0);
+  // Operator shortcut: ?step=4.1 jumps straight to a step.
+  const id = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("step") : null;
+  const i = id ? STEPS.findIndex((s) => s.id === id) : -1;
+  enterStep(Math.max(0, i));
 }
 
 /* ---------- Success actions ---------- */
