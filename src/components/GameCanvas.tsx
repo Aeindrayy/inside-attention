@@ -1,6 +1,7 @@
 import { Suspense, useEffect } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { XR, createXRStore } from "@react-three/xr";
+import { XR } from "@react-three/xr";
+import { xrStore } from "@/xr";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useGLTF } from "@react-three/drei";
 import { SpaceEnvironment } from "./Environment";
@@ -14,12 +15,6 @@ import { XRInput } from "@/input/XRInput";
 import { useGame, useOperatorKeys, setState } from "@/game/useGameState";
 import { MODEL_URLS } from "@/assets";
 
-export const xrStore = createXRStore({
-  frameBufferScaleFactor: 1,
-  emulate: false,
-  hand: { rayPointer: false, grabPointer: false, touchPointer: false, teleportPointer: false },
-  controller: { rayPointer: false, grabPointer: false, teleportPointer: false },
-});
 
 function XRSessionFlag() {
   const { gl } = useThree();

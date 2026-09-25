@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useProgress } from "@react-three/drei";
 import { startGame } from "@/game/useGameState";
 import { audio, startDrone } from "@/audio/sfx";
-import { xrStore } from "./GameCanvas";
+import { xrStore } from "@/xr";
 
 export function StartScreen() {
   const { progress, active } = useProgress();
