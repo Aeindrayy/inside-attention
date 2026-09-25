@@ -9,11 +9,11 @@ export type Source = "illustrative" | "transformer" | "gpt2";
 export const COLORS = {
   background: "#05070F",
   accent: "#6CCBFF",
-  headBlue: "#3AA0FF",
+  queryBeam: "#FFD166",
+  headBlue: "#D66BFF",
   headOrange: "#FF9A3A",
   river: "#3AA0FF",
   money: "#FFC23A",
-  mirrorGreen: "#55E69B",
 };
 
 /** Starting (embedding) colors of tokens. */

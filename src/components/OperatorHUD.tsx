@@ -28,7 +28,7 @@ export function OperatorHUD() {
         </div>
         <p className="mt-2 font-display text-xs text-muted-foreground">
           P / Esc {paused ? "resume" : "pause"} · M {muted ? "muted" : "sound on"} · T voice {voice ? "on" : "off"}
-          {step.lights === 2 && ` · Tab: mouse controls ${active === 1 ? "BLUE (left)" : "ORANGE (right)"}`}
+          {step.lights === 2 && ` · Tab: mouse controls ${active === 1 ? "VIOLET (left)" : "ORANGE (right)"}`}
         </p>
       </div>
     </div>

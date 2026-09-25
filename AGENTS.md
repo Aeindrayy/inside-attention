@@ -11,3 +11,4 @@
 
 - Attention charts use the local deterministic transformer layer in `src/game/attention.ts`; keep inference synchronous and lightweight to preserve Quest frame rate and offline play.
 - XR locomotion moves an `XROrigin`; transform raw controller poses through that origin so room-scale tracking and flashlights stay aligned.
+- Desktop arrow keys reserve up/down for forward/back movement and left/right for turning, matching spatial navigation expectations.

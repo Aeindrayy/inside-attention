@@ -69,8 +69,9 @@ export function Stage() {
   const words = sentence?.context ?? [];
   const positions = useMemo(() => {
     if (portalsScene) return arcPositions(7, 2.45);
+    if (heads) return arcPositions(words.length, 1.42, 3.45);
     return arcPositions(stage1 ? 6 : Math.max(1, words.length));
-  }, [portalsScene, stage1, words.length]);
+  }, [heads, portalsScene, stage1, words.length]);
   const posByWord = useMemo(() => {
     const m: Record<string, THREE.Vector3> = {};
     words.forEach((w, i) => (m[w] = positions[i].clone().setY(positions[i].y + MIRROR_OFFSET_Y)));
@@ -84,7 +85,7 @@ export function Stage() {
   const s1Colors = useRef(STAGE1_TOKENS.map(() => "#dfe8f5"));
 
   /* ----- lights config ----- */
-  const lightColor = (l: 0 | 1) => (heads ? (l === 1 ? COLORS.headBlue : COLORS.headOrange) : COLORS.accent);
+  const lightColor = (l: 0 | 1) => (heads ? (l === 1 ? COLORS.headBlue : COLORS.headOrange) : COLORS.queryBeam);
   const activeLights: (0 | 1)[] = step.lights === 2 ? [0, 1] : step.lights === 1 ? [0] : [];
 
   /* ----- per-frame director ----- */
@@ -270,9 +271,9 @@ export function Stage() {
           <Stage1Token key={`s1-${i}`} i={i} word={w} target={s1Targets[i]} from={s1From[i]} colors={s1Colors} hide={scene === "become" && i === 5} />
         ))}
 
-      {!stage1 && sentence && !["pipeline", "end"].includes(scene) &&
+      {!stage1 && sentence && !["compare", "pipeline", "end"].includes(scene) &&
         words.map((w, i) => (
-          <Token key={`${keyBase}-${i}`} word={w} badge={i + 1} target={positions[i]} color={colorOf(w)} opacity={scene === "compare" ? 0.35 : 1} />
+          <Token key={`${keyBase}-${i}`} word={w} badge={i + 1} target={positions[i]} color={colorOf(w)} opacity={scene === "compare" ? 0.35 : 1} scale={heads ? 0.72 : 1} />
         ))}
 
       {portalsScene && (
@@ -293,8 +294,8 @@ export function Stage() {
           if (heads)
             return (
               <group key={`m-${keyBase}-${i}`}>
-                <Mirror position={p.clone().add(new THREE.Vector3(-0.11, 0, 0))} index={i} word={w} keyMatch={transformerAffinity(w, sentence.player, 1)} light={1} color={COLORS.mirrorGreen} size={0.26} />
-                <Mirror position={p.clone().add(new THREE.Vector3(0.11, 0, 0))} index={i + 20} word={w} keyMatch={transformerAffinity(w, sentence.player, 0)} light={0} color={COLORS.mirrorGreen} size={0.26} />
+                <Mirror position={p.clone().add(new THREE.Vector3(-0.14, 0, 0))} index={i} word={w} keyMatch={transformerAffinity(w, sentence.player, 1)} light={1} color={colorOf(w)} size={0.2} />
+                <Mirror position={p.clone().add(new THREE.Vector3(0.14, 0, 0))} index={i + 20} word={w} keyMatch={transformerAffinity(w, sentence.player, 0)} light={0} color={colorOf(w)} size={0.2} />
               </group>
             );
           return (
@@ -305,7 +306,7 @@ export function Stage() {
               word={w}
               keyMatch={transformerAffinity(w, sentence.player, 0)}
               light={0}
-              color={COLORS.mirrorGreen}
+              color={colorOf(w)}
               valueColor={scene === "values" ? sentence.values?.[i] : undefined}
             />
           );
@@ -379,11 +380,11 @@ function Slab() {
   return (
     <group ref={g} position={SLAB_POS}>
       <RoundedBox args={[SLAB_SIZE.w, SLAB_SIZE.h, SLAB_SIZE.d]} radius={0.02}>
-        <meshStandardMaterial color="#9fb8d8" metalness={0.3} roughness={0.08} transparent opacity={0.28} emissive="#1d3a66" emissiveIntensity={0.5} />
-        <Edges color="#6CCBFF" />
+        <meshStandardMaterial color="#50358a" metalness={0.2} roughness={0.16} transparent opacity={0.92} emissive="#9A8CFF" emissiveIntensity={0.65} />
+        <Edges color="#FFD166" threshold={10} />
       </RoundedBox>
-      <Glow scale={2.6} color="#3AA0FF" opacity={0.25} />
-      <T position={[0, 0, SLAB_SIZE.d / 2 + 0.005]} fontSize={0.17} outlineWidth={0.005} outlineColor="#05070F">
+      <Glow scale={2.6} color="#FFD166" opacity={0.22} />
+      <T position={[0, 0, SLAB_SIZE.d / 2 + 0.005]} fontSize={0.17} color="#ffffff" outlineWidth={0.008} outlineColor="#24143f">
         {STAGE1_SENTENCE}
       </T>
     </group>
@@ -443,17 +444,10 @@ function Diagram() {
 }
 
 const pillarMat = new THREE.MeshBasicMaterial({ color: "#6CCBFF", transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
-const corridorRingMat = new THREE.MeshStandardMaterial({ color: "#c0c8d6", emissive: "#3AA0FF", emissiveIntensity: 0.15, metalness: 0.95, roughness: 0.25 });
 function Corridor() {
-  const rings = [-7, -9.5, -12];
   const pillars = Array.from({ length: 7 }, (_, i) => -1.5 - i * 1.5);
   return (
     <group>
-      {rings.map((z) => (
-        <group key={z} position={[0, 2.6, z]}>
-          <Model name="magical_ring" material={corridorRingMat} size={7} />
-        </group>
-      ))}
       {pillars.map((z) =>
         [-3.2, 3.2].map((x) => (
           <mesh key={`${x}${z}`} position={[x, 1.5, z]} material={pillarMat}>

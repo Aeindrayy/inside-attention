@@ -7,7 +7,7 @@ import { input } from "@/input";
 import { WALL_Z } from "@/game/layout";
 
 const BEAM_LENGTH = 3;
-const BEAM_RADIUS = Math.tan(THREE.MathUtils.degToRad(12)) * BEAM_LENGTH;
+const BEAM_RADIUS = Math.tan(THREE.MathUtils.degToRad(9)) * BEAM_LENGTH;
 
 const bodyMat = new THREE.MeshStandardMaterial({ color: "#aab4c4", metalness: 0.95, roughness: 0.28 });
 
