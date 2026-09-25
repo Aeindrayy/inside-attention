@@ -17,7 +17,8 @@ function Lock({ position }: { position: [number, number, number] }) {
         <boxGeometry args={[0.2, 0.15, 0.035]} />
         <meshStandardMaterial color="#4a1830" emissive={PINK} emissiveIntensity={0.5} metalness={0.55} roughness={0.3} />
       </mesh>
-      <T position={[0, -0.035, -0.021]} rotation-y={Math.PI} fontSize={0.055} color="#ffffff">0%</T>
+      <T position={[0, -0.035, -0.021]} fontSize={0.055} color="#ffffff">0%</T>
+      <T position={[0, -0.17, -0.021]} fontSize={0.045} color="#ffb2cf">FUTURE</T>
     </group>
   );
 }
