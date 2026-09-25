@@ -40,7 +40,8 @@ export function headFrame() {
 /** The player's own token floats 0.6 m in front at chest height. */
 export function repTarget(out = new THREE.Vector3()) {
   const { f } = headFrame();
-  return out.copy(input.head).addScaledVector(f, 0.6).setY(input.head.y - 0.45);
+  const desk = input.mode === "desktop";
+  return out.copy(input.head).addScaledVector(f, desk ? 0.8 : 0.6).setY(input.head.y - (desk ? 0.3 : 0.45));
 }
 
 /** Portal layout at the end of the corridor, scaled by probability. */
