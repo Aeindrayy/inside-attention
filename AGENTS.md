@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Attention charts use the local deterministic transformer layer in `src/game/attention.ts`; keep inference synchronous and lightweight to preserve Quest frame rate and offline play.

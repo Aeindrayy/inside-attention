@@ -3,7 +3,7 @@
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let muted = false;
-let droneNodes: { osc: OscillatorNode[]; gain: GainNode } | null = null;
+let droneNodes: { osc: OscillatorNode[]; gain: GainNode; lfo: OscillatorNode } | null = null;
 
 export function audio() {
   if (typeof window === "undefined") return null;
@@ -104,26 +104,34 @@ export function doorOpen() {
   o.stop(c.currentTime + 1.5);
 }
 
-/** Ambient low drone. */
+/** Soft ambient chord with a very slow breath-like swell. */
 export function startDrone() {
   const c = audio();
   if (!c || !master || droneNodes) return;
   const gain = c.createGain();
   gain.gain.value = 0;
-  gain.gain.linearRampToValueAtTime(0.05, c.currentTime + 3);
+  gain.gain.linearRampToValueAtTime(0.022, c.currentTime + 4);
   const f = c.createBiquadFilter();
   f.type = "lowpass";
-  f.frequency.value = 400;
-  const osc = [55, 82.4, 110.3].map((fr) => {
+  f.frequency.value = 760;
+  f.Q.value = 0.35;
+  const osc = [110, 164.81, 220].map((fr, i) => {
     const o = c.createOscillator();
-    o.type = "sawtooth";
+    o.type = i === 1 ? "triangle" : "sine";
     o.frequency.value = fr;
+    o.detune.value = i === 0 ? -4 : i === 2 ? 3 : 0;
     o.connect(f);
     o.start();
     return o;
   });
+  const lfo = c.createOscillator();
+  const lfoDepth = c.createGain();
+  lfo.frequency.value = 0.07;
+  lfoDepth.gain.value = 0.006;
+  lfo.connect(lfoDepth).connect(gain.gain);
+  lfo.start();
   f.connect(gain).connect(master);
-  droneNodes = { osc, gain };
+  droneNodes = { osc, gain, lfo };
 }
 
 /** Mirror hums: soft sine oscillators whose volume and pitch follow weights. */
@@ -158,10 +166,15 @@ export function speak(text: string) {
   if (!voiceOn || typeof speechSynthesis === "undefined" || muted) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  const v = speechSynthesis.getVoices().find((x) => x.lang.startsWith("en"));
+  const voices = speechSynthesis.getVoices().filter((x) => x.lang.toLowerCase().startsWith("en"));
+  const preferred = ["Samantha", "Ava", "Aria", "Jenny", "Google UK English Female", "Google US English"];
+  const v = preferred.map((name) => voices.find((voice) => voice.name.includes(name))).find(Boolean)
+    ?? voices.find((voice) => /natural|enhanced|premium/i.test(voice.name))
+    ?? voices[0];
   if (v) u.voice = v;
   u.lang = "en-US";
-  u.rate = 1.02;
-  u.pitch = 1.1;
+  u.rate = 0.94;
+  u.pitch = 1.03;
+  u.volume = 0.88;
   speechSynthesis.speak(u);
 }

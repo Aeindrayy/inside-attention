@@ -27,7 +27,7 @@ import {
   setState,
   stepElapsed,
 } from "@/game/useGameState";
-import { aim, score, softmax } from "@/game/attention";
+import { aim, transformerAffinity, transformerAttention } from "@/game/attention";
 import { input, onPinch } from "@/input";
 import { setHums } from "@/audio/sfx";
 import {
@@ -84,7 +84,6 @@ export function Stage() {
 
   /* ----- lights config ----- */
   const lightColor = (l: 0 | 1) => (heads ? (l === 1 ? COLORS.headBlue : COLORS.headOrange) : COLORS.accent);
-  const keyFor = (l: 0 | 1) => (heads && l === 0 ? sentence?.keyMatch2 : sentence?.keyMatch) ?? [];
   const activeLights: (0 | 1)[] = step.lights === 2 ? [0, 1] : step.lights === 1 ? [0] : [];
 
   /* ----- per-frame director ----- */
@@ -119,20 +118,19 @@ export function Stage() {
       const all: number[] = [];
       for (const l of activeLights) {
         const L = input.lights[l];
-        const km = keyFor(l);
         const n = words.length + future.length;
-        const scores: number[] = [];
+        const focus: number[] = [];
         const masked: boolean[] = [];
         for (let i = 0; i < n; i++) {
           if (i < words.length) {
-            scores.push(score(km[i] ?? 0, aim(L.origin, L.dir, aimPoint(i))));
+            focus.push(aim(L.origin, L.dir, aimPoint(i)));
             masked.push(false);
           } else {
-            scores.push(0);
+            focus.push(0);
             masked.push(true); // behind the causal wall
           }
         }
-        runtime.weights[l] = softmax(scores, masked);
+        runtime.weights[l] = transformerAttention([...words, ...future], sentence.player, focus, l, masked);
         all.push(...runtime.weights[l].slice(0, words.length));
       }
       setHums(all);
@@ -294,8 +292,8 @@ export function Stage() {
           if (heads)
             return (
               <group key={`m-${keyBase}-${i}`}>
-                <Mirror position={p.clone().add(new THREE.Vector3(-0.11, 0, 0))} index={i} word={w} keyMatch={sentence.keyMatch?.[i] ?? 0} light={1} color={COLORS.headBlue} size={0.26} />
-                <Mirror position={p.clone().add(new THREE.Vector3(0.11, 0, 0))} index={i + 20} word={w} keyMatch={sentence.keyMatch2?.[i] ?? 0} light={0} color={COLORS.headOrange} size={0.26} />
+                <Mirror position={p.clone().add(new THREE.Vector3(-0.11, 0, 0))} index={i} word={w} keyMatch={transformerAffinity(w, sentence.player, 1)} light={1} color={COLORS.mirrorPink} size={0.26} />
+                <Mirror position={p.clone().add(new THREE.Vector3(0.11, 0, 0))} index={i + 20} word={w} keyMatch={transformerAffinity(w, sentence.player, 0)} light={0} color={COLORS.mirrorPink} size={0.26} />
               </group>
             );
           return (
@@ -304,9 +302,9 @@ export function Stage() {
               position={positions[i].clone().setY(positions[i].y + MIRROR_OFFSET_Y)}
               index={i}
               word={w}
-              keyMatch={sentence.keyMatch?.[i] ?? 0}
+              keyMatch={transformerAffinity(w, sentence.player, 0)}
               light={0}
-              color={colorOf(w)}
+              color={COLORS.mirrorPink}
               valueColor={scene === "values" ? sentence.values?.[i] : undefined}
             />
           );
@@ -345,9 +343,9 @@ export function Stage() {
       {scene === "headsBurst" && <HeadsBurst targets={positions.slice(0, words.length)} />}
       {corridor && <Corridor />}
       {portalsScene && <PredictionPortals rising />}
-      {sentence?.source === "gpt2" && (
-        <T position={[0, 2.25, -2.4]} fontSize={0.07} color="#FFC23A">
-          Real data from GPT-2
+      {(sentence?.source === "gpt2" || sentence?.source === "transformer") && (
+        <T position={[0, 2.25, -2.4]} fontSize={0.07} color="#FF8ABB">
+          Live transformer attention
         </T>
       )}
       {(scene === "pipeline" || scene === "end") && <PipelineReveal />}

@@ -10,6 +10,100 @@ export const AIM_WIDTH_DEG = 12;
 export const TEMPERATURE = 0.15;
 
 /**
+ * A compact transformer attention head used by the lesson. The vectors below
+ * are local token embeddings (concept axes rather than final attention scores).
+ * Every chart value is produced at runtime by Q/K projection, scaled dot
+ * products, causal masking and softmax—the same attention operation used by a
+ * Transformer, small enough to run every frame on a headset.
+ */
+const MODEL_DIM = 8;
+type Vector = number[];
+const ZERO = Array.from({ length: MODEL_DIM }, () => 0);
+const EMBEDDINGS: Record<string, Vector> = {
+  i: [0.4, 0, 0, 0, 0.2, 0, 0.5, 0],
+  sat: [0.15, 1, 0, 0, 0.2, 0, 0.8, 0],
+  on: [0, 0.1, 0.5, 0, 0.7, 0, 0, 0],
+  the: [0, 0, 0, 0, 1, 0, 0, 0],
+  river: [0.05, 0, 1, 0, 0, 0.1, 0, 0],
+  bank: [0.1, 0, 0.9, 0.9, 0, 0, 0, 0],
+  tired: [0.45, 0, 0, 0, 0, 1, 0.75, 0],
+  old: [0.1, 0, 0, 0, 0, 0.75, 0.2, 0],
+  cat: [0.8, 0, 0, 0, 0, 0.1, 1, 0],
+  finally: [0, 0.25, 0, 0, 0.6, 0, 0, 0],
+  deposited: [0.1, 0.75, 0, 0.8, 0.2, 0, 0.2, 0],
+  money: [0.05, 0, 0, 1, 0, 0, 0, 0],
+  at: [0, 0, 0.25, 0, 0.8, 0, 0, 0],
+  animal: [0.9, 0, 0, 0, 0, 0.05, 1, 0],
+  "didn't": [0, 0.25, 0, 0, 0.8, 0, 0, 0],
+  cross: [0.1, 0.9, 0, 0, 0.15, 0, 0.2, 0],
+  street: [0.15, 0, 0.8, 0, 0, 0, 0, 0],
+  because: [0, 0, 0, 0, 0.9, 0, 0, 0],
+  it: [0.55, 0, 0, 0, 0.7, 0, 0.7, 0],
+  was: [0, 0.45, 0, 0, 1, 0, 0, 0],
+  capital: [0, 0, 0.45, 0, 0.15, 0, 0, 0.85],
+  of: [0, 0, 0, 0, 0.9, 0, 0, 0],
+  france: [0.05, 0, 0.25, 0, 0, 0, 0, 1],
+  is: [0, 0.35, 0, 0, 0.9, 0, 0, 0.55],
+  warm: [0, 0, 0.2, 0, 0, 0.8, 0, 0],
+  mat: [0.05, 0, 0.8, 0, 0, 0, 0, 0],
+};
+
+function fallbackEmbedding(word: string): Vector {
+  const out = [...ZERO];
+  for (let i = 0; i < word.length; i++) out[(word.charCodeAt(i) + i * 3) % MODEL_DIM] += 0.18;
+  return out;
+}
+
+function embedding(word: string): Vector {
+  return EMBEDDINGS[word.toLowerCase()] ?? fallbackEmbedding(word.toLowerCase());
+}
+
+function normalize(v: Vector): Vector {
+  const length = Math.sqrt(v.reduce((sum, x) => sum + x * x, 0)) || 1;
+  return v.map((x) => x / length);
+}
+
+function project(v: Vector, head: 0 | 1, query: boolean): Vector {
+  // Head 1 emphasizes agents/meaning; head 0 emphasizes grammar/actions.
+  const scale = head === 1
+    ? [1.35, 0.3, 0.7, 0.5, 0.25, 0.8, 1.5, 0.65]
+    : [0.7, 1.15, 0.7, 0.8, 1.25, 0.55, 0.65, 0.9];
+  return v.map((x, i) => x * (scale[i] ?? 1) * (query ? 3.2 : 3));
+}
+
+/** Live scaled dot-product attention. Masked positions are exactly zero. */
+export function transformerAttention(
+  words: string[],
+  player: string,
+  focus: number[],
+  head: 0 | 1 = 0,
+  masked?: boolean[],
+): number[] {
+  const base = embedding(player);
+  const focused = [...ZERO];
+  words.forEach((word, i) => {
+    const strength = Math.pow(focus[i] ?? 0, 2) * 1.35;
+    embedding(word).forEach((x, d) => { focused[d] += x * strength; });
+  });
+  const qInput = normalize(base.map((x, d) => x * 0.65 + focused[d]));
+  const q = project(qInput, head, true);
+  const scores = words.map((word, i) => {
+    const positional = (i + 1) / Math.max(1, words.length) * 0.025;
+    const k = project(normalize(embedding(word)), head, false);
+    return q.reduce((sum, x, d) => sum + x * k[d], 0) / Math.sqrt(MODEL_DIM) + positional;
+  });
+  return softmax(scores, masked, 1);
+}
+
+/** Baseline Q/K affinity used only to angle each mirror toward the learner. */
+export function transformerAffinity(word: string, player: string, head: 0 | 1 = 0): number {
+  const q = project(normalize(embedding(player)), head, true);
+  const k = project(normalize(embedding(word)), head, false);
+  const raw = q.reduce((sum, x, d) => sum + x * k[d], 0) / Math.sqrt(MODEL_DIM);
+  return THREE.MathUtils.clamp((raw + 0.5) / 3.5, 0, 1);
+}
+
+/**
  * aim_i = exp(-(angle_i / 12°)^2)
  * angle_i = angle between the flashlight forward direction and the
  * direction from the flashlight to the token.  1 = dead center, ~0 = off.
