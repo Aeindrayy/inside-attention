@@ -1,5 +1,4 @@
-import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useMemo } from "react";
 import { Environment as DreiEnv, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
 import { Model } from "./Model";
