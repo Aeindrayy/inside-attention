@@ -292,8 +292,8 @@ export function Stage() {
           if (heads)
             return (
               <group key={`m-${keyBase}-${i}`}>
-                <Mirror position={p.clone().add(new THREE.Vector3(-0.11, 0, 0))} index={i} word={w} keyMatch={transformerAffinity(w, sentence.player, 1)} light={1} color={COLORS.mirrorPink} size={0.26} />
-                <Mirror position={p.clone().add(new THREE.Vector3(0.11, 0, 0))} index={i + 20} word={w} keyMatch={transformerAffinity(w, sentence.player, 0)} light={0} color={COLORS.mirrorPink} size={0.26} />
+                <Mirror position={p.clone().add(new THREE.Vector3(-0.11, 0, 0))} index={i} word={w} keyMatch={transformerAffinity(w, sentence.player, 1)} light={1} color={COLORS.mirrorGreen} size={0.26} />
+                <Mirror position={p.clone().add(new THREE.Vector3(0.11, 0, 0))} index={i + 20} word={w} keyMatch={transformerAffinity(w, sentence.player, 0)} light={0} color={COLORS.mirrorGreen} size={0.26} />
               </group>
             );
           return (
@@ -304,7 +304,7 @@ export function Stage() {
               word={w}
               keyMatch={transformerAffinity(w, sentence.player, 0)}
               light={0}
-              color={COLORS.mirrorPink}
+              color={COLORS.mirrorGreen}
               valueColor={scene === "values" ? sentence.values?.[i] : undefined}
             />
           );

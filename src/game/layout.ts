@@ -7,7 +7,7 @@ export const ARC_RADIUS = 2.5;
 export const TOKEN_Y = 1.5;
 export const MIRROR_OFFSET_Y = 0.42;
 export const WALL_Z = 2.2;
-export const FUTURE_Z = 3.3;
+export const FUTURE_Z = 3.05;
 export const SPHERE_POS = new THREE.Vector3(-2.1, 1.5, -1.3);
 export const SLAB_POS = new THREE.Vector3(0, 1.5, -2.3);
 export const SLAB_SIZE = { w: 2.3, h: 0.36, d: 0.06 };
@@ -25,7 +25,7 @@ export function arcPositions(n: number, y = TOKEN_Y, radius = ARC_RADIUS): THREE
 
 /** Future tokens behind the causal wall (mirror of an arc, behind the player). */
 export function futurePositions(n: number): THREE.Vector3[] {
-  return Array.from({ length: n }, (_, i) => new THREE.Vector3(((n - 1) / 2 - i) * 0.6, TOKEN_Y, FUTURE_Z));
+  return Array.from({ length: n }, (_, i) => new THREE.Vector3(((n - 1) / 2 - i) * 0.72, TOKEN_Y + 0.08, FUTURE_Z));
 }
 
 /** Yaw-only forward and right vectors of the player's head. */

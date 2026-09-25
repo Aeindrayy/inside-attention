@@ -1,8 +1,8 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { XR } from "@react-three/xr";
+import { XR, XROrigin } from "@react-three/xr";
+import type { Group } from "three";
 import { xrStore } from "@/xr";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useGLTF } from "@react-three/drei";
 import { SpaceEnvironment } from "./Environment";
 import { Stage } from "./Stage";
@@ -12,6 +12,7 @@ import { StartScreen } from "./StartScreen";
 import { OperatorHUD } from "./OperatorHUD";
 import { DesktopControls } from "@/input/DesktopControls";
 import { XRInput } from "@/input/XRInput";
+import { XRLocomotion } from "@/input/XRLocomotion";
 import { useGame, useOperatorKeys, setState } from "@/game/useGameState";
 import { MODEL_URLS } from "@/assets";
 
@@ -31,19 +32,9 @@ function XRSessionFlag() {
   return null;
 }
 
-function DesktopBloom() {
-  const bloom = useGame((s) => s.bloom);
-  const xr = useGame((s) => s.xr);
-  if (!bloom || xr) return null;
-  return (
-    <EffectComposer>
-      <Bloom intensity={0.9} luminanceThreshold={0.7} mipmapBlur />
-    </EffectComposer>
-  );
-}
-
 export function GameCanvas() {
   const phase = useGame((s) => s.phase);
+  const originRef = useRef<Group>(null);
   useOperatorKeys();
   useEffect(() => {
     MODEL_URLS.forEach((u) => useGLTF.preload(u));
@@ -52,9 +43,11 @@ export function GameCanvas() {
     <div className="fixed inset-0 bg-background">
       <Canvas dpr={[1, 1.75]} camera={{ position: [0, 1.6, 0], fov: 60, near: 0.05, far: 120 }} gl={{ antialias: true }}>
         <XR store={xrStore}>
+          <XROrigin ref={originRef} />
           <XRSessionFlag />
           <DesktopControls />
-          <XRInput />
+          <XRLocomotion originRef={originRef} />
+          <XRInput originRef={originRef} />
           <SpaceEnvironment />
           <Suspense fallback={null}>
             {phase === "playing" && (
@@ -66,7 +59,6 @@ export function GameCanvas() {
           </Suspense>
           <Fader />
         </XR>
-        <DesktopBloom />
       </Canvas>
       {phase === "start" ? <StartScreen /> : <OperatorHUD />}
     </div>

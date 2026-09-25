@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { input, emitPinch } from "./index";
 import { getState, currentStep } from "@/game/useGameState";
-import { audio, startDrone } from "@/audio/sfx";
+import { audio, startAmbience } from "@/audio/sfx";
 
 /**
  * Desktop: mouse aims the flashlight from the camera, left click = pinch,
@@ -18,7 +18,7 @@ export function DesktopControls() {
     const s = st.current;
     const onDown = (e: PointerEvent) => {
       audio();
-      startDrone();
+      startAmbience();
       if (e.button === 2) s.drag = true;
       if (e.button === 0) {
         const step = currentStep();
@@ -69,13 +69,17 @@ export function DesktopControls() {
     const dt = Math.min(raw, 0.05);
     const s = st.current;
     const k = s.keys;
-    if (k.has("a") || k.has("arrowleft")) s.yaw += dt * 1.4;
-    if (k.has("d") || k.has("arrowright")) s.yaw -= dt * 1.4;
+    const paused = getState().paused;
+    if (!paused && (k.has("q") || k.has("arrowleft"))) s.yaw += dt * 1.4;
+    if (!paused && (k.has("e") || k.has("arrowright"))) s.yaw -= dt * 1.4;
     if (k.has("arrowup")) s.pitch = Math.min(1.2, s.pitch + dt);
     if (k.has("arrowdown")) s.pitch = Math.max(-1.2, s.pitch - dt);
     const f = new THREE.Vector3(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
-    if (k.has("w")) s.pos.addScaledVector(f, dt * 1.5);
-    if (k.has("s")) s.pos.addScaledVector(f, -dt * 1.5);
+    const r = new THREE.Vector3(Math.cos(s.yaw), 0, -Math.sin(s.yaw));
+    if (!paused && k.has("w")) s.pos.addScaledVector(f, dt * 1.5);
+    if (!paused && k.has("s")) s.pos.addScaledVector(f, -dt * 1.5);
+    if (!paused && k.has("a")) s.pos.addScaledVector(r, -dt * 1.5);
+    if (!paused && k.has("d")) s.pos.addScaledVector(r, dt * 1.5);
     clampPos(s.pos);
 
     camera.position.copy(s.pos);
