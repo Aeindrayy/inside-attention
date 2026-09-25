@@ -398,6 +398,7 @@ function EmbeddingSphere({ visible }: { visible: boolean }) {
     g.current.rotation.y += dt * 0.4;
     const k = THREE.MathUtils.lerp(g.current.scale.x, visible ? 1 : 0.001, 0.06);
     g.current.scale.setScalar(k);
+    g.current.visible = k > 0.01;
     g.current.position.y = SPHERE_POS.y + Math.sin(s.clock.elapsedTime) * 0.04;
   });
   return (
