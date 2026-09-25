@@ -8,6 +8,7 @@ import { toPercents } from "@/game/attention";
 
 const ROW = 0.034;
 const BAR_W = 0.16;
+const barGeo = new THREE.PlaneGeometry(BAR_W, 0.014).translate(BAR_W / 2, 0, 0);
 
 /** Floating panel attached to a flashlight: one bar per token, sums to 100%. */
 export function AttentionMeter({ light, words, masked, color, highlight }: { light: 0 | 1; words: string[]; masked?: boolean[]; color: string; highlight?: boolean }) {
@@ -62,8 +63,7 @@ export function AttentionMeter({ light, words, masked, color, highlight }: { lig
               <planeGeometry args={[BAR_W, 0.014]} />
               <meshBasicMaterial color="#1a2336" />
             </mesh>
-            <mesh ref={(r) => { bars.current[i] = r; }} position={[-0.05 - BAR_W / 2, 0, 0.001]}>
-              <planeGeometry args={[BAR_W, 0.014]} />
+            <mesh ref={(r) => { bars.current[i] = r; }} position={[-0.05 - BAR_W / 2, 0, 0.001]} geometry={barGeo}>
               <meshBasicMaterial color={m ? "#333" : color} toneMapped={false} />
             </mesh>
             <T position={[0.155, 0, 0]} anchorX="right" fontSize={0.02} color={m ? "#566077" : "#ffffff"}>
