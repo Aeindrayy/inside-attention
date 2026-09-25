@@ -273,7 +273,7 @@ export function Stage() {
 
       {!stage1 && sentence && !["compare", "pipeline", "end"].includes(scene) &&
         words.map((w, i) => (
-          <Token key={`${keyBase}-${i}`} word={w} badge={i + 1} target={positions[i]} color={colorOf(w)} opacity={scene === "compare" ? 0.35 : 1} />
+          <Token key={`${keyBase}-${i}`} word={w} badge={i + 1} target={positions[i]} color={colorOf(w)} opacity={scene === "compare" ? 0.35 : 1} scale={heads ? 0.72 : 1} />
         ))}
 
       {portalsScene && (

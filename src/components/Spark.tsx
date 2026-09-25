@@ -19,7 +19,7 @@ export function Spark() {
     if (!o) return;
     const { f, r } = headFrame();
     const t = state.clock.elapsedTime;
-    const target = input.head.clone().addScaledVector(f, 1.05).addScaledVector(r, 1.35).setY(input.head.y + 0.68 + Math.sin(t * 1.6) * 0.03);
+    const target = input.head.clone().addScaledVector(f, 1.35).addScaledVector(r, 0.95).setY(input.head.y + 0.58 + Math.sin(t * 1.6) * 0.03);
     if (first.current) {
       o.position.copy(target);
       first.current = false;
