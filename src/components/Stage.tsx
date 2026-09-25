@@ -50,6 +50,7 @@ const END_BUTTONS = [
 export function Stage() {
   const stepIndex = useGame((s) => s.stepIndex);
   const phase = useGame((s) => s.phase);
+  const paused = useGame((s) => s.paused);
   const repColor = useGame((s) => s.repColor);
   const repRiver = useGame((s) => s.repRiver);
   const repMoney = useGame((s) => s.repMoney);
@@ -91,7 +92,7 @@ export function Stage() {
   const aimPoint = (i: number) => tmp.copy(positions[i]).setY(positions[i].y + 0.2);
 
   useFrame((_, raw) => {
-    if (phase !== "playing") return;
+    if (phase !== "playing" || paused) return;
     const dt = Math.min(raw, 0.05);
     tickStep();
     const e = stepElapsed();
@@ -199,7 +200,7 @@ export function Stage() {
   /* ----- pinch handling ----- */
   useEffect(() => {
     return onPinch((l) => {
-      if (getState().phase !== "playing" || getState().fading) return;
+      if (getState().phase !== "playing" || getState().fading || getState().paused) return;
       const st = currentStep();
       const t = st.trigger;
       const L = input.lights[l];

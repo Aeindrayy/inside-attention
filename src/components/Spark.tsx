@@ -49,7 +49,7 @@ export function NarrationPanel() {
   const [nar, setNar] = useState({ text: "", isHint: false });
   const last = useRef("");
   useFrame(() => {
-    if (getState().phase !== "playing") return;
+    if (getState().phase !== "playing" || getState().paused) return;
     const n = narrationAt(currentStep(), stepElapsed());
     const k = n.text + n.isHint;
     if (k !== last.current) {
