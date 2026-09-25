@@ -4,13 +4,13 @@ import * as THREE from "three";
 import { Model } from "./Model";
 import { Glow, T } from "./fx";
 import { input } from "@/input";
-import { repTarget } from "@/game/layout";
+import { repTarget, headFrame } from "@/game/layout";
 
 /**
  * The player's own token, 0.6 m in front at chest height. Its color animates
  * smoothly (1.5 s) whenever the representation changes.
  */
-export function PlayerRepresentation({ word, color, visible = true, label = "Your representation" }: { word: string; color: string; visible?: boolean; label?: string }) {
+export function PlayerRepresentation({ word, color, visible = true, label = "Your representation", offset }: { word: string; color: string; visible?: boolean; label?: string; offset?: [number, number, number] }) {
   const g = useRef<THREE.Group>(null);
   const mat = useMemo(
     () => new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.45, metalness: 0.5, roughness: 0.2 }),
@@ -39,6 +39,11 @@ export function PlayerRepresentation({ word, color, visible = true, label = "You
     mat.emissive.copy(mat.color);
     if (glowRef.current) (glowRef.current.material as THREE.SpriteMaterial).color.copy(mat.color);
     repTarget(tmp);
+    if (offset) {
+      const { f, r } = headFrame();
+      tmp.addScaledVector(r, offset[0]).addScaledVector(f, offset[2]);
+      tmp.y += offset[1];
+    }
     tmp.y += Math.sin(state.clock.elapsedTime * 1.5) * 0.015;
     if (first.current) {
       o.position.copy(tmp);
