@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox, Edges } from "@react-three/drei";
 import * as THREE from "three";
@@ -32,7 +32,6 @@ import { input, onPinch } from "@/input";
 import { setHums } from "@/audio/sfx";
 import {
   arcPositions,
-  futurePositions,
   MIRROR_OFFSET_Y,
   SLAB_POS,
   SLAB_SIZE,
@@ -77,14 +76,11 @@ export function Stage() {
     return m;
   }, [words, positions]);
   const future = showWall ? sentence?.future ?? [] : [];
-  const futurePos = useMemo(() => futurePositions(future.length), [future.length]);
 
   /* ----- stage 1 animated targets ----- */
   const s1Targets = useMemo(() => STAGE1_TOKENS.map(() => new THREE.Vector3()), []);
   const s1From = useMemo(() => STAGE1_TOKENS.map((_, i) => new THREE.Vector3(SLAB_POS.x - 0.95 + i * 0.38, SLAB_POS.y, SLAB_POS.z)), []);
   const s1Colors = useRef(STAGE1_TOKENS.map(() => "#dfe8f5"));
-  const s1ColorState = useGame(() => 0);
-  void s1ColorState;
 
   /* ----- lights config ----- */
   const lightColor = (l: 0 | 1) => (heads ? (l === 1 ? COLORS.headBlue : COLORS.headOrange) : COLORS.accent);
@@ -260,7 +256,7 @@ export function Stage() {
   /* ----- render ----- */
   const repWord = sentence?.player ?? "bank";
   const repVisible =
-    (scene === "become" && stepElapsed() > 0) || ["attention", "wall", "values", "heads", "headsBurst", "corridor", "portals", "portalResult"].includes(scene);
+    scene === "become" || ["attention", "wall", "values", "heads", "headsBurst", "corridor", "portals", "portalResult"].includes(scene);
   const keyBase = step.sentence ?? "s1";
   const corridor = scene === "corridor" || portalsScene;
 
@@ -316,7 +312,6 @@ export function Stage() {
         })}
 
       {showWall && sentence?.future && <CausalWall future={sentence.future} startBadge={words.length + 2} />}
-      {void futurePos}
 
       {/* Flashlights + meters */}
       {activeLights.map((l) => (
@@ -360,14 +355,13 @@ export function Stage() {
   );
 }
 
-function Stage1Token({ i, word, target, from, colors, hide }: { i: number; word: string; target: THREE.Vector3; from: THREE.Vector3; colors: React.MutableRefObject<string[]>; hide: boolean }) {
+function Stage1Token({ i, word, target, from, colors, hide }: { i: number; word: string; target: THREE.Vector3; from: THREE.Vector3; colors: { current: string[] }; hide: boolean }) {
   // Re-render color from the ref a few times per second.
   const [, force] = useStateTick();
   void force;
   return <Token word={word} badge={i + 1} target={target} from={from} color={colors.current[i]} visible={!hide || stepElapsed() < 1.3} />;
 }
 
-import { useState } from "react";
 function useStateTick() {
   const [n, set] = useState(0);
   useFrame((s) => {
