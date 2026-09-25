@@ -14,7 +14,6 @@ export const COLORS = {
   headOrange: "#FF9A3A",
   river: "#3AA0FF",
   money: "#FFC23A",
-  mirrorGreen: "#55E69B",
 };
 
 /** Starting (embedding) colors of tokens. */
