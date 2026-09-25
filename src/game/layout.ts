@@ -6,8 +6,8 @@ import { PREDICTIONS } from "@/data/scenario";
 export const ARC_RADIUS = 2.5;
 export const TOKEN_Y = 1.5;
 export const MIRROR_OFFSET_Y = 0.42;
-export const WALL_Z = 2.2;
-export const FUTURE_Z = 3.05;
+export const WALL_Z = 3.05;
+export const FUTURE_Z = 3.82;
 export const SPHERE_POS = new THREE.Vector3(-2.1, 1.5, -1.3);
 export const SLAB_POS = new THREE.Vector3(0, 1.5, -2.3);
 export const SLAB_SIZE = { w: 2.3, h: 0.36, d: 0.06 };
@@ -46,14 +46,14 @@ export function repTarget(out = new THREE.Vector3()) {
 
 /** Portal layout at the end of the corridor, scaled by probability. */
 export function portalLayout() {
-  const heights = PREDICTIONS.map((p) => 0.6 + 1.9 * Math.sqrt(p.p / PREDICTIONS[0].p));
-  const widths = heights.map((h) => h * 0.9);
-  const gap = 0.3;
+  const heights = PREDICTIONS.map((p) => 0.52 + 1.18 * Math.sqrt(p.p / PREDICTIONS[0].p));
+  const widths = heights.map((h) => h * 0.76);
+  const gap = 0.22;
   const total = widths.reduce((a, b) => a + b, 0) + gap * (widths.length - 1);
   let x = -total / 2;
   return PREDICTIONS.map((p, i) => {
     const cx = x + widths[i] / 2;
     x += widths[i] + gap;
-    return { ...p, h: heights[i], w: widths[i], pos: new THREE.Vector3(cx, 0, -5.5) };
+    return { ...p, h: heights[i], w: widths[i], pos: new THREE.Vector3(cx, -0.28, -4.9) };
   });
 }

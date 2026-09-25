@@ -90,7 +90,10 @@ export function transformerAttention(
   const scores = words.map((word, i) => {
     const positional = (i + 1) / Math.max(1, words.length) * 0.025;
     const k = project(normalize(embedding(word)), head, false);
-    return q.reduce((sum, x, d) => sum + x * k[d], 0) / Math.sqrt(MODEL_DIM) + positional;
+    // The beam is an immediate query signal, so changing targets visibly
+    // changes the scaled dot-product result in the same rendered frame.
+    const beamSignal = Math.pow(focus[i] ?? 0, 1.25) * 1.8;
+    return q.reduce((sum, x, d) => sum + x * k[d], 0) / Math.sqrt(MODEL_DIM) + beamSignal + positional;
   });
   return softmax(scores, masked, 1);
 }

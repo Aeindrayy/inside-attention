@@ -86,7 +86,10 @@ export function DesktopControls() {
     camera.updateMatrixWorld();
 
     // Flashlight: origin near the "hand", pointing where the mouse points.
-    ray.current.setFromCamera(s.mouse, camera);
+    // The causal-mask lesson keeps the query centered so turning reveals the
+    // complete past/now/future display instead of sending the beam off-frame.
+    const pointer = currentStep().scene === "wall" ? _center : s.mouse;
+    ray.current.setFromCamera(pointer, camera);
     const target = ray.current.ray.at(3, new THREE.Vector3());
     const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
     const up = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
@@ -103,6 +106,8 @@ export function DesktopControls() {
   });
   return null;
 }
+
+const _center = new THREE.Vector2(0, 0);
 
 function clampPos(p: THREE.Vector3) {
   const max = 6;

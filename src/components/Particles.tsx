@@ -30,7 +30,7 @@ export function Particles({ count = 500 }) {
         vertexShader: `attribute float seed; uniform float uTime; varying float vA;
           void main(){ vec3 p=position; p.y += mod(uTime*0.08*(0.5+seed) + seed*9., 9.) - 4.5 + 3.5; p.x += sin(uTime*0.2+seed*20.)*0.3;
           vec4 mv=modelViewMatrix*vec4(p,1.); gl_PointSize = (18.+seed*30.) / -mv.z; vA = 0.35+seed*0.5; gl_Position=projectionMatrix*mv; }`,
-        fragmentShader: `uniform sampler2D uMap; varying float vA; void main(){ vec4 t=texture2D(uMap, gl_PointCoord); gl_FragColor=vec4(vec3(0.42,0.8,1.)*t.a*vA, t.a*vA); }`,
+        fragmentShader: `uniform sampler2D uMap; varying float vA; void main(){ vec4 t=texture2D(uMap, gl_PointCoord); vec3 teal=vec3(.13,.84,.75); vec3 gold=vec3(.95,.72,.32); vec3 c=mix(teal,gold,smoothstep(.68,1.,vA)); gl_FragColor=vec4(c*t.a*vA,t.a*vA); }`,
       }),
     [],
   );

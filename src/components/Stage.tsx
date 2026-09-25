@@ -380,11 +380,11 @@ function Slab() {
   return (
     <group ref={g} position={SLAB_POS}>
       <RoundedBox args={[SLAB_SIZE.w, SLAB_SIZE.h, SLAB_SIZE.d]} radius={0.02}>
-        <meshStandardMaterial color="#50358a" metalness={0.2} roughness={0.16} transparent opacity={0.92} emissive="#9A8CFF" emissiveIntensity={0.65} />
-        <Edges color="#FFD166" threshold={10} />
+        <meshStandardMaterial color="#0c4250" metalness={0.55} roughness={0.2} transparent opacity={0.96} emissive="#00b89c" emissiveIntensity={0.42} />
+        <Edges color="#F3C969" threshold={10} />
       </RoundedBox>
       <Glow scale={2.6} color="#FFD166" opacity={0.22} />
-      <T position={[0, 0, SLAB_SIZE.d / 2 + 0.005]} fontSize={0.17} color="#ffffff" outlineWidth={0.008} outlineColor="#24143f">
+      <T position={[0, 0, SLAB_SIZE.d / 2 + 0.005]} fontSize={0.17} color="#ffffff" outlineWidth={0.008} outlineColor="#06242c">
         {STAGE1_SENTENCE}
       </T>
     </group>
@@ -431,13 +431,13 @@ function EmptySlot({ position }: { position: THREE.Vector3 }) {
 
 function Diagram() {
   return (
-    <group position={[0, 2.35, -2.3]}>
+    <group position={[0, 0.82, -2.25]}>
       <mesh position={[0, 0, -0.01]}>
-        <planeGeometry args={[2.2, 0.26]} />
-        <meshBasicMaterial color="#070b16" transparent opacity={0.8} />
+        <planeGeometry args={[1.72, 0.24]} />
+        <meshBasicMaterial color="#073138" transparent opacity={0.94} />
       </mesh>
-      <T fontSize={0.1} color="#ffffff">
-        QUERY (flashlight) → KEY (mirror) → strong match
+      <T fontSize={0.085} color="#F3C969">
+        STRONG MATCH = RELEVANT TOKEN
       </T>
     </group>
   );
