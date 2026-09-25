@@ -256,7 +256,7 @@ export function Stage() {
   /* ----- render ----- */
   const repWord = sentence?.player ?? "bank";
   const repVisible =
-    scene === "become" || ["attention", "wall", "values", "heads", "headsBurst", "corridor", "portals", "portalResult"].includes(scene);
+    scene === "become" || ["attention", "wall", "values", "heads", "headsBurst", "corridor"].includes(scene);
   const keyBase = step.sentence ?? "s1";
   const corridor = scene === "corridor" || portalsScene;
 
