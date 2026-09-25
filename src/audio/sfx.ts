@@ -23,6 +23,7 @@ export function audio() {
 
 export function setMuted(m: boolean) {
   muted = m;
+  if (m) stopVoice();
   if (master && ctx) master.gain.setTargetAtTime(m ? 0 : 0.8, ctx.currentTime, 0.05);
 }
 export const isMuted = () => muted;

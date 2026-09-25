@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
@@ -48,15 +48,19 @@ const sparkMat = new THREE.MeshStandardMaterial({ color: "#bfe8ff", emissive: "#
 export function NarrationPanel() {
   const [nar, setNar] = useState({ text: "", isHint: false });
   const last = useRef("");
-  useFrame(() => {
-    if (getState().phase !== "playing" || getState().paused) return;
-    const n = narrationAt(currentStep(), stepElapsed());
-    const k = n.text + n.isHint;
-    if (k !== last.current) {
+  useEffect(() => {
+    const sync = () => {
+      if (getState().phase !== "playing" || getState().paused) return;
+      const n = narrationAt(currentStep(), stepElapsed());
+      const k = n.text + n.isHint;
+      if (k === last.current) return;
       last.current = k;
       setNar({ text: n.text, isHint: n.isHint });
-    }
-  });
+    };
+    sync();
+    const timer = window.setInterval(sync, 120);
+    return () => window.clearInterval(timer);
+  }, []);
   if (!nar.text) return null;
   return (
     <group position={[0.62, -0.02, 0]}>
