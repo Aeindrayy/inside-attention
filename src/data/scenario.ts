@@ -174,6 +174,8 @@ export interface Step {
   lines: string[];
   hint?: string;
   trigger: Trigger;
+  /** Per-step safety auto-advance override (seconds). */
+  autoAfter?: number;
   /** Number of flashlights: 0, 1 or 2. */
   lights: 0 | 1 | 2;
   meter?: boolean;
@@ -185,24 +187,24 @@ export const STEPS: Step[] = [
     lines: ["A language model first breaks text into tokens."],
     hint: "Touch or click the sentence.", trigger: { type: "slab" } },
   { id: "1.2", stage: "Stage 1 — Become a Token", title: "Embeddings", scene: "tokens1", lights: 0,
-    lines: ["Each token gets a starting representation."], trigger: { type: "auto", minSeconds: 5 } },
+    lines: ["Each token gets a starting representation."], trigger: { type: "auto", minSeconds: 4 } },
   { id: "1.3", stage: "Stage 1 — Become a Token", title: "You are 'bank'", scene: "become", lights: 0,
     lines: ["You are now the token 'bank'.", "Your starting representation doesn't know the context yet."],
-    trigger: { type: "auto" } },
+    trigger: { type: "auto", minSeconds: 5 } },
   // STAGE 2
   { id: "2.1", stage: "Stage 2 — Query + Keys", title: "Flashlight & mirrors", scene: "attention", sentence: "river", lights: 1,
     lines: ["Your flashlight is your query: what are you looking for?", "Each mirror is a key: what that token offers."],
-    trigger: { type: "auto" } },
+    trigger: { type: "auto", minSeconds: 6 } },
   { id: "2.2", stage: "Stage 2 — Query + Keys", title: "Find the match", scene: "attention", sentence: "river", lights: 1,
-    lines: [], hint: "Shine your light on the words.", trigger: { type: "hold", target: "river" } },
+    lines: [], hint: "Shine your light on the words.", trigger: { type: "hold", target: "river" }, autoAfter: 18 },
   { id: "2.3", stage: "Stage 2 — Query + Keys", title: "Strong match", scene: "attention", sentence: "river", lights: 1,
     lines: ["A strong match means this token is relevant."], trigger: { type: "auto", minSeconds: 4 } },
   // STAGE 3
   { id: "3.1", stage: "Stage 3 — Softmax + Causal Mask", title: "New sentence", scene: "attention", sentence: "cat", lights: 1, meter: true,
-    lines: ["Now you are 'sat'. Who did the sitting?"], trigger: { type: "auto" } },
+    lines: ["Now you are 'sat'. Who did the sitting?"], trigger: { type: "auto", minSeconds: 5 } },
   { id: "3.2", stage: "Stage 3 — Softmax + Causal Mask", title: "Softmax", scene: "attention", sentence: "cat", lights: 1, meter: true,
     lines: ["Your attention is shared. It always adds up to 100%.", "Softmax turns match scores into attention weights."],
-    hint: "Sweep your light across the words.", trigger: { type: "weightHold", target: "cat", weight: 0.5 } },
+    hint: "Sweep your light across the words.", trigger: { type: "weightHold", target: "cat", weight: 0.5 }, autoAfter: 20 },
   { id: "3.3", stage: "Stage 3 — Softmax + Causal Mask", title: "Turn around", scene: "wall", sentence: "cat", lights: 1, meter: true,
     lines: ["Now turn around."], hint: "Look behind you at the locked future words.", trigger: { type: "lookWall" } },
   { id: "3.4", stage: "Stage 3 — Softmax + Causal Mask", title: "Causal mask", scene: "wall", sentence: "cat", lights: 1, meter: true,
