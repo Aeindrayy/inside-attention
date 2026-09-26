@@ -295,7 +295,7 @@ export function tickStep() {
   const lines = linesFor(step);
   const linesTotal = lines.reduce((a, l) => a + lineDuration(l), 0);
   if (t.type === "auto") {
-    if (elapsed >= Math.max(linesTotal + 0.6, t.minSeconds ?? 0) + STEP_EXTRA_SECONDS && !runtime.succeeded) {
+    if (elapsed >= Math.max(linesTotal + 0.6, t.minSeconds ?? 0, STEP_EXTRA_SECONDS) && !runtime.succeeded) {
       runtime.succeeded = true;
       next();
     }
